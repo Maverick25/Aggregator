@@ -13,9 +13,9 @@ import dk.aggregator.dto.LoanResponseDTO;
 import dk.aggregator.messaging.Receive;
 import dk.aggregator.messaging.Send;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import javax.swing.plaf.basic.BasicProgressBarUI;
 
 /**
  *
@@ -30,6 +30,7 @@ public class AggregateQuotes
         gson = new Gson();
         
         HashMap<String,Object> objects = Receive.setUpReceiver();
+        List<LoanResponseDTO> dtos = null;
         
         QueueingConsumer consumer = (QueueingConsumer) objects.get("consumer");
         Channel channel = (Channel) objects.get("channel");
@@ -47,17 +48,17 @@ public class AggregateQuotes
           
           System.out.println(loanResponseDTO.toString());
           
-          sendMessage(loanResponseDTO);
+          sendMessage(loanResponseDTO, replyProps);
 
           channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
         }
         
     }
     
-    public static void sendMessage(LoanResponseDTO dto) throws IOException
+    public static void sendMessage(LoanResponseDTO dto, AMQP.BasicProperties props) throws IOException
     {
         String message = gson.toJson(dto);
         
-        Send.sendMessage(message);
+        Send.sendMessage(message,props);
     }
 }

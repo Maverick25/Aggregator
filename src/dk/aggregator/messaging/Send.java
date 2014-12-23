@@ -9,7 +9,6 @@ import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.MessageProperties;
 import java.io.IOException;
 
 /**
@@ -20,7 +19,7 @@ public class Send
 {
     private static final String TASK_QUEUE_NAME = "queue_loanResponse";
     
-    public static void sendMessage(String message) throws IOException 
+    public static void sendMessage(String message,AMQP.BasicProperties props) throws IOException 
     {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("datdb.cphbusiness.dk");
@@ -32,7 +31,7 @@ public class Send
         channel.queueDeclare(TASK_QUEUE_NAME, true, false, false, null);
         
         channel.basicPublish( "", TASK_QUEUE_NAME, 
-                MessageProperties.PERSISTENT_TEXT_PLAIN,
+                props,
                 message.getBytes());
         
         channel.close();
